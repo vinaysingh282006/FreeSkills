@@ -1,0 +1,124 @@
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+import numpy as np
+
+st.set_page_config(
+    page_title="Flight Safety Incident Analysis",
+    page_icon="✈️",
+    layout="wide"
+)
+
+st.title("✈️ Global Aviation Incident Analysis Dashboard")
+st.markdown("---")
+
+@st.cache_data
+def load_data():
+    years = np.random.randint(2000, 2025, 500)
+    incident_types = np.random.choice([
+        'Accident - Fatal', 'Accident - Non-Fatal',
+        'Serious Incident', 'Minor Incident', 'Ground Incident'
+    ], 500, p=[0.05, 0.15, 0.30, 0.40, 0.10])
+
+    locations = np.random.choice([
+        'USA', 'Europe', 'Asia', 'South America', 'Africa', 'Oceania'
+    ], 500)
+
+    df = pd.DataFrame({
+        'Year': years,
+        'Type': incident_types,
+        'Location': locations,
+        'Date': pd.to_datetime(years, format='%Y') + pd.to_timedelta(np.random.randint(0, 365, 500), unit='d'),
+        'Fatalities': np.where(incident_types == 'Accident - Fatal',
+                               np.random.randint(1, 150, 500), 0)
+    })
+
+    df['Year'] = df['Date'].dt.year
+
+    return df
+
+data = load_data()
+
+st.sidebar.header("Filter Options")
+
+min_year = int(data['Year'].min())
+max_year = int(data['Year'].max())
+year_range = st.sidebar.slider(
+    'Select Year Range',
+    min_value=min_year,
+    max_value=max_year,
+    value=(2010, max_year)
+)
+
+selected_types = st.sidebar.multiselect(
+    'Select Incident Type(s)',
+    options=data['Type'].unique(),
+    default=data['Type'].unique()
+)
+
+df_filtered = data[
+    (data['Year'] >= year_range[0]) &
+    (data['Year'] <= year_range[1]) &
+    (data['Type'].isin(selected_types))
+]
+
+st.sidebar.info(f"Showing **{len(df_filtered)}** incidents.")
+
+st.subheader("Key Statistics")
+col1, col2, col3 = st.columns(3)
+
+total_incidents = len(df_filtered)
+total_fatalities = df_filtered['Fatalities'].sum()
+avg_fatalities = df_filtered[df_filtered['Fatalities'] > 0]['Fatalities'].mean()
+
+with col1:
+    st.metric(label="Total Incidents (Filtered)", value=f"{total_incidents:,}")
+with col2:
+    st.metric(label="Total Fatalities (Filtered)", value=f"{total_fatalities:,}")
+with col3:
+    st.metric(label="Avg. Fatalities per Fatal Accident", value=f"{avg_fatalities:,.1f}" if not np.isnan(avg_fatalities) else "N/A")
+
+st.markdown("---")
+
+st.subheader("Incident Count Over Time")
+incidents_over_time = df_filtered.groupby('Year').size().reset_index(name='Count')
+fig_time = px.line(
+    incidents_over_time,
+    x='Year',
+    y='Count',
+    title='Total Incidents Per Year',
+    markers=True
+)
+st.plotly_chart(fig_time, use_container_width=True)
+
+col4, col5 = st.columns(2)
+
+with col4:
+    st.subheader("Incidents by Type")
+    incidents_by_type = df_filtered.groupby('Type').size().reset_index(name='Count')
+    fig_type = px.bar(
+        incidents_by_type,
+        x='Count',
+        y='Type',
+        orientation='h',
+        title='Distribution by Incident Severity',
+        color='Type'
+    )
+    st.plotly_chart(fig_type, use_container_width=True)
+
+with col5:
+    st.subheader("Incidents by Location")
+    incidents_by_loc = df_filtered.groupby('Location').size().reset_index(name='Count')
+    fig_loc = px.pie(
+        incidents_by_loc,
+        values='Count',
+        names='Location',
+        title='Geographic Distribution',
+        hole=0.3
+    )
+    st.plotly_chart(fig_loc, use_container_width=True)
+
+st.markdown("---")
+
+st.subheader("Raw Data (Filtered)")
+st.dataframe(df_filtered.sort_values(by='Date', ascending=False), height=300)
