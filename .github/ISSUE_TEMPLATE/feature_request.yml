@@ -1,27 +1,50 @@
-name: Feature request
-description: Suggest an idea for this project
-type: Feature
-labels: enhancement
+name: "🚀 Feature Request"
+description: Suggest new flight crash data features
+labels: ["feature-request", "triage"]
 body:
-  - type: textarea
+  - type: markdown
     attributes:
-      label: Is your feature request related to a problem or challenge?
-      description: Please describe what you are trying to do.
-      placeholder: >
-        A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
-        (This section helps developers understand the context and *why* for this feature, in addition to the *what*)
+      value: |
+        ## New Flight Crash Feature
+
   - type: textarea
+    id: problem
     attributes:
-      label: Describe the solution you'd like
-      placeholder: >
-        A clear and concise description of what you want to happen.
+      label: "💥 Problem"
+      description: "What can't you do now?"
+      placeholder: "Can't filter crashes by aircraft manufacturer"
+    validations:
+      required: true
+
   - type: textarea
+    id: solution
     attributes:
-      label: Describe alternatives you've considered
-      placeholder: >
-        A clear and concise description of any alternative solutions or features you've considered.
+      label: "💡 Solution"
+      description: "What feature do you want?"
+      placeholder: "Add filter dropdown: Boeing, Airbus, Embraer, etc."
+    validations:
+      required: true
+
   - type: textarea
+    id: use-case
     attributes:
-      label: Additional context
-      placeholder: >
-        Add any other context or screenshots about the feature request here.
+      label: "👥 Use Case"
+      description: "Who benefits? Example usage?"
+      placeholder: "Researchers want to analyze Boeing vs Airbus safety stats"
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: "✅ Done When"
+      description: "What makes it complete?"
+      placeholder: |
+        - Filter appears in sidebar
+        - Returns correct results
+        - Works on mobile
+
+  - type: textarea
+    id: data-needed
+    attributes:
+      label: "📊 Data Needed?"
+      description: "Any new data fields required?"
+      placeholder: "Aircraft manufacturer column in dataset"

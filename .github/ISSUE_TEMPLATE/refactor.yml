@@ -1,0 +1,48 @@
+name: "🔧 Refactoring"
+description: Improve flight crash codebase
+labels: ["refactor", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Flight Crash Code Cleanup
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: "🚨 Current Issues"
+      description: "What's wrong with code?"
+      placeholder: |
+        - data.js has duplicate parsing logic
+        - search.js has 300+ line functions
+        - No error handling for bad CSV data
+    validations:
+      required: true
+
+  - type: textarea
+    id: files
+    attributes:
+      label: "📁 Files"
+      description: "Specific files to fix"
+      placeholder: |
+        data/flights.csv
+        src/search.js
+        src/map.js
+    validations:
+      required: true
+
+  - type: textarea
+    id: goals
+    attributes:
+      label: "🎯 Goals"
+      description: "What improves?"
+      placeholder: |
+        - Single CSV parser function
+        - Functions < 100 lines
+        - Add data validation
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: "⚠️ Impact"
+      description: "Breaking changes? Tests needed?"
