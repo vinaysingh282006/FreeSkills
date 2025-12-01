@@ -12,6 +12,10 @@ let markers = L.markerClusterGroup({
   maxClusterRadius: 80, // Maximum radius that a cluster will cover from the central marker
 });
 
+// Weather API configuration (using OpenWeatherMap as an example)
+const WEATHER_API_KEY = "YOUR_API_KEY"; // This should be replaced with an actual API key
+const WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather";
+
 let crashData = [];
 let chart;
 let timelineChart;
@@ -140,6 +144,57 @@ function updateAnalytics(data) {
   });
 }
 
+// Timeline chart function
+function updateTimeline(data) {
+  // Group data by year
+  const yearlyData = {};
+  data.forEach((d) => {
+    yearlyData[d.Year] = (yearlyData[d.Year] || 0) + 1;
+  });
+
+  const years = Object.keys(yearlyData).sort();
+  const counts = years.map((year) => yearlyData[year]);
+
+  const ctx = document.getElementById("timeline-chart").getContext("2d");
+  
+  if (timelineChart) timelineChart.destroy();
+  
+  timelineChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: years,
+      datasets: [{
+        label: "Crashes per Year",
+        data: counts,
+        borderColor: "rgba(54, 162, 235, 1)",
+        backgroundColor: "rgba(54, 162, 235, 0.2)",
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: "Number of Crashes"
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: "Year"
+          }
+        }
+      }
+    }
+  });
+}
+
 // Apply filter function
 function applyFilters() {
   const minY = +document.getElementById("yearMin").value || 0;
@@ -168,6 +223,7 @@ function applyFilters() {
 
   renderMarkers(filtered);
   updateAnalytics(filtered);
+  updateTimeline(filtered);
 }
 
 // Reset filter function
@@ -178,8 +234,15 @@ function resetFilters() {
   document.getElementById("regionFilter").value = "";
   document.getElementById("fatalFilter").value = "";
   
+  // Reset weather filters
+  document.getElementById("precipitationFilter").value = "all";
+  document.getElementById("windMin").value = "";
+  document.getElementById("windMax").value = "";
+  document.getElementById("visibilityFilter").value = "";
+  
   renderMarkers(crashData);
   updateAnalytics(crashData);
+  updateTimeline(crashData);
 }
 
 // Event listeners
