@@ -65,10 +65,10 @@ Developed using **Streamlit**, **Plotly**, and **Folium**, the project blends **
 | **💀 Fatality Trends** | Area chart for year-wise fatalities      |
 | **💰 Cost Breakdown**  | Cost estimation and airline risk visuals |
 
-![Preview 1](History-of-all-flight-crash-map-main/webpreview1.png)
-![Preview 2](History-of-all-flight-crash-map-main/webpreview2.png)
-![Preview 3](History-of-all-flight-crash-map-main/webpreview3.png)
-![Preview 4](History-of-all-flight-crash-map-main/webpreview4.png)
+![Preview 1](/History-of-all-flight-crash-map-main/webpreview1.png)
+![Preview 2](/History-of-all-flight-crash-map-main/webpreview2.png)
+![Preview 3](/History-of-all-flight-crash-map-main/webpreview3.png)
+![Preview 4](/History-of-all-flight-crash-map-main/webpreview4.png)
 
 > 🌐 **Live App:** [Flight Crash Mapped](https://flightcrashmapped.streamlit.app/)  
 > Explore the entire dataset interactively with animations, filters, and geospatial mapping!
