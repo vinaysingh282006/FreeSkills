@@ -7,10 +7,6 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; OpenStreetMap contributors",
 }).addTo(map);
 
-// Weather API configuration - using OpenWeatherMap as an example
-const WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather";
-const WEATHER_API_KEY = "YOUR_API_KEY_HERE"; // Replace with actual API key
-
 // Create a marker cluster group
 let markers = L.markerClusterGroup({
   spiderfyOnMaxZoom: true,
