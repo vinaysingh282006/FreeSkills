@@ -7,10 +7,6 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; OpenStreetMap contributors",
 }).addTo(map);
 
-// Weather API configuration - using OpenWeatherMap as an example
-const WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather";
-const WEATHER_API_KEY = "YOUR_API_KEY_HERE"; // Replace with actual API key
-
 // Create a marker cluster group
 let markers = L.markerClusterGroup({
   spiderfyOnMaxZoom: true,
@@ -20,7 +16,7 @@ let markers = L.markerClusterGroup({
 });
 
 // Weather API configuration (using OpenWeatherMap as an example)
-const WEATHER_API_KEY = "YOUR_API_KEY"; // This should be replaced with an actual API key
+const WEATHER_API_KEY = "YOUR_API_KEY_HERE"; // This should be replaced with an actual API key
 const WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather";
 
 let crashData = [];
@@ -425,9 +421,236 @@ function futureEnhancement() {
   // Will implement advanced filtering options
 }
 
+/**
+ * Initialize the comparison dashboard
+ */
+function initComparisonDashboard() {
+  const comparisonType = document.getElementById('comparisonType');
+  comparisonType.addEventListener('change', updateComparisonSelection);
+  
+  document.getElementById('generateComparison').addEventListener('click', generateComparison);
+  
+  // Initial population of selection options
+  updateComparisonSelection();
+}
+
+/**
+ * Update the comparison selection options based on selected comparison type
+ */
+function updateComparisonSelection() {
+  const comparisonType = document.getElementById('comparisonType').value;
+  const selectionContainer = document.getElementById('comparisonSelection');
+  
+  // Clear existing options
+  selectionContainer.innerHTML = '';
+  
+  let options = [];
+  
+  switch(comparisonType) {
+    case 'country':
+      // Get unique countries
+      options = [...new Set(crashData.map(crash => crash.Country).filter(Boolean))];
+      break;
+    case 'type':
+      // Get unique aircraft types
+      options = [...new Set(crashData.map(crash => crash.Type).filter(Boolean))];
+      break;
+    case 'decade':
+      // Get unique decades
+      options = [...new Set(crashData.map(crash => Math.floor(crash.Year / 10) * 10))].sort();
+      break;
+  }
+  
+  // Create checkboxes for each option
+  options.forEach(option => {
+    const div = document.createElement('div');
+    div.className = 'comparison-option';
+    
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = `compare-${comparisonType}-${option}`;
+    checkbox.value = option;
+    checkbox.name = 'comparisonItems';
+    
+    const label = document.createElement('label');
+    label.htmlFor = `compare-${comparisonType}-${option}`;
+    label.textContent = option;
+    
+    div.appendChild(checkbox);
+    div.appendChild(label);
+    selectionContainer.appendChild(div);
+  });
+}
+
+/**
+ * Generate comparison based on selected items
+ */
+function generateComparison() {
+  const comparisonType = document.getElementById('comparisonType').value;
+  const selectedItems = Array.from(document.querySelectorAll('input[name="comparisonItems"]:checked'))
+    .map(checkbox => checkbox.value);
+  
+  // Limit to 3 items for clearer visualization
+  if (selectedItems.length === 0) {
+    alert('Please select at least one item to compare');
+    return;
+  }
+  
+  if (selectedItems.length > 3) {
+    alert('Please select up to 3 items for comparison');
+    return;
+  }
+  
+  // Filter data for selected items
+  const filteredData = selectedItems.map(item => {
+    switch(comparisonType) {
+      case 'country':
+        return crashData.filter(crash => crash.Country === item);
+      case 'type':
+        return crashData.filter(crash => crash.Type === item);
+      case 'decade':
+        const decade = parseInt(item);
+        return crashData.filter(crash => Math.floor(crash.Year / 10) * 10 === decade);
+      default:
+        return [];
+    }
+  });
+  
+  // Generate charts and statistics
+  generateComparisonCharts(selectedItems, filteredData, comparisonType);
+  generateComparisonStats(selectedItems, filteredData, comparisonType);
+  
+  // Show the dashboard
+  document.getElementById('comparison-dashboard').style.display = 'block';
+}
+
+/**
+ * Generate comparison charts
+ * @param {Array} items - Selected items to compare
+ * @param {Array} dataSets - Filtered data for each item
+ * @param {string} comparisonType - Type of comparison
+ */
+function generateComparisonCharts(items, dataSets, comparisonType) {
+  // Clear existing charts
+  for (let i = 1; i <= 3; i++) {
+    const canvas = document.getElementById(`comparison-chart-${i}`);
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  
+  // Generate a chart for each selected item (up to 3)
+  items.forEach((item, index) => {
+    if (index >= 3) return; // Limit to 3 charts
+    
+    const dataSet = dataSets[index];
+    const canvasId = `comparison-chart-${index + 1}`;
+    
+    // Group data by year for timeline
+    const yearlyData = {};
+    dataSet.forEach(crash => {
+      yearlyData[crash.Year] = (yearlyData[crash.Year] || 0) + 1;
+    });
+    
+    const years = Object.keys(yearlyData).sort();
+    const counts = years.map(year => yearlyData[year]);
+    
+    // Create chart
+    new Chart(document.getElementById(canvasId), {
+      type: 'bar',
+      data: {
+        labels: years,
+        datasets: [{
+          label: `${item} Crashes by Year`,
+          data: counts,
+          backgroundColor: `rgba(${50 + index * 50}, ${100 + index * 30}, ${200 - index * 30}, 0.7)`,
+          borderColor: `rgba(${50 + index * 50}, ${100 + index * 30}, ${200 - index * 30}, 1)`,
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Number of Crashes'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Year'
+            }
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: `${item} Crash Timeline`
+          }
+        }
+      }
+    });
+  });
+}
+
+/**
+ * Generate comparison statistics
+ * @param {Array} items - Selected items to compare
+ * @param {Array} dataSets - Filtered data for each item
+ * @param {string} comparisonType - Type of comparison
+ */
+function generateComparisonStats(items, dataSets, comparisonType) {
+  const statsContainer = document.getElementById('comparison-stats-content');
+  
+  // Create table for statistics
+  let html = `
+    <div class="comparison-stat-row">
+      <strong>Statistic</strong>
+      ${items.map(item => `<strong>${item}</strong>`).join('')}
+    </div>
+  `;
+  
+  // Calculate statistics for each dataset
+  const stats = dataSets.map(dataSet => {
+    const totalCrashes = dataSet.length;
+    const totalFatalities = dataSet.reduce((sum, crash) => sum + (crash.Fatalities || 0), 0);
+    const avgFatalities = totalCrashes ? (totalFatalities / totalCrashes).toFixed(1) : 0;
+    
+    return {
+      totalCrashes,
+      totalFatalities,
+      avgFatalities
+    };
+  });
+  
+  // Add rows for each statistic
+  html += `
+    <div class="comparison-stat-row">
+      <span>Total Crashes</span>
+      ${stats.map(stat => `<span>${stat.totalCrashes}</span>`).join('')}
+    </div>
+    <div class="comparison-stat-row">
+      <span>Total Fatalities</span>
+      ${stats.map(stat => `<span>${stat.totalFatalities}</span>`).join('')}
+    </div>
+    <div class="comparison-stat-row">
+      <span>Avg Fatalities per Crash</span>
+      ${stats.map(stat => `<span>${stat.avgFatalities}</span>`).join('')}
+    </div>
+  `;
+  
+  statsContainer.innerHTML = html;
+}
+
 // 📡 Event listeners for filter buttons
 document.getElementById("applyFilter").addEventListener("click", applyFilters);
 document.getElementById("resetFilter").addEventListener("click", resetFilters);
+
+// Initialize comparison dashboard when page loads
+document.addEventListener('DOMContentLoaded', initComparisonDashboard);
 
 // 🚀 Initialize the application when page loads
 loadData();

@@ -91,6 +91,41 @@
       <div id="operator-container">
         <canvas id="operator-chart" width="200" height="200"></canvas>
       </div>
+      
+      <hr />
+      
+      <h3>Comparative Analysis</h3>
+      <div class="comparison-controls">
+        <label>Compare By:</label>
+        <select id="comparisonType">
+          <option value="country">Country</option>
+          <option value="type">Aircraft Type</option>
+          <option value="decade">Decade</option>
+        </select>
+        
+        <label>Select Items to Compare (up to 3):</label>
+        <div id="comparisonSelection"></div>
+        
+        <button id="generateComparison">Generate Comparison</button>
+      </div>
+      
+      <div id="comparison-dashboard" style="display: none;">
+        <h4>Comparison Results</h4>
+        <div class="comparison-charts">
+          <div class="chart-container">
+            <canvas id="comparison-chart-1" width="200" height="150"></canvas>
+          </div>
+          <div class="chart-container">
+            <canvas id="comparison-chart-2" width="200" height="150"></canvas>
+          </div>
+          <div class="chart-container">
+            <canvas id="comparison-chart-3" width="200" height="150"></canvas>
+          </div>
+        </div>
+        <div class="comparison-stats">
+          <div id="comparison-stats-content"></div>
+        </div>
+      </div>
     </div>
 
     <div id="map"></div>
