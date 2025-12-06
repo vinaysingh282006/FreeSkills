@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Flight Crash Map – Filters & Analytics</title>
     <link rel="stylesheet" href="style.css" />
+    <script>
+      function showMapView() {
+        document.getElementById('map-view').style.display = 'block';
+        document.getElementById('leaderboard-view').style.display = 'none';
+        document.getElementById('show-leaderboard-btn').style.display = 'inline-block';
+      }
+      
+      function showLeaderboardView() {
+        document.getElementById('map-view').style.display = 'none';
+        document.getElementById('leaderboard-view').style.display = 'block';
+        document.getElementById('show-leaderboard-btn').style.display = 'none';
+      }
+    </script>
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -66,6 +79,7 @@
 
       <button id="applyFilter">Apply Filters</button>
       <button id="resetFilter">Reset Filters</button>
+      <button id="show-leaderboard-btn" onclick="showLeaderboardView()">View Leaderboard</button>
 
       <hr />
 
@@ -93,7 +107,79 @@
       </div>
     </div>
 
-    <div id="map"></div>
+    <div id="content">
+      <div id="map-view">
+        <div id="map"></div>
+      </div>
+      
+      <div id="leaderboard-view" style="display: none; padding: 20px;">
+        <h2>Flight Crash Leaderboard</h2>
+        
+        <div class="leaderboard-controls">
+          <button id="show-map-btn">Back to Map</button>
+        </div>
+        
+        <div class="leaderboard-section">
+          <h3>Top Countries by Number of Crashes</h3>
+          <table id="countries-leaderboard">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Country</th>
+                <th>Crashes</th>
+                <th>Fatalities</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        
+        <div class="leaderboard-section">
+          <h3>Top Aircraft Types by Number of Crashes</h3>
+          <table id="types-leaderboard">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Aircraft Type</th>
+                <th>Crashes</th>
+                <th>Fatalities</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        
+        <div class="leaderboard-section">
+          <h3>Highest Fatality Incidents</h3>
+          <table id="fatalities-leaderboard">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Location</th>
+                <th>Year</th>
+                <th>Type</th>
+                <th>Fatalities</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        
+        <div class="leaderboard-section">
+          <h3>Decade Analysis</h3>
+          <table id="decades-leaderboard">
+            <thead>
+              <tr>
+                <th>Decade</th>
+                <th>Crashes</th>
+                <th>Fatalities</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Add Leaflet.markercluster JS -->

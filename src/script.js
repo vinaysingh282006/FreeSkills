@@ -7,10 +7,6 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; OpenStreetMap contributors",
 }).addTo(map);
 
-// Weather API configuration - using OpenWeatherMap as an example
-const WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather";
-const WEATHER_API_KEY = "YOUR_API_KEY_HERE"; // Replace with actual API key
-
 // Create a marker cluster group
 let markers = L.markerClusterGroup({
   spiderfyOnMaxZoom: true,
@@ -20,7 +16,7 @@ let markers = L.markerClusterGroup({
 });
 
 // Weather API configuration (using OpenWeatherMap as an example)
-const WEATHER_API_KEY = "YOUR_API_KEY"; // This should be replaced with an actual API key
+const WEATHER_API_KEY = "YOUR_API_KEY_HERE"; // This should be replaced with an actual API key
 const WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather";
 
 let crashData = [];
@@ -182,6 +178,9 @@ function updateAnalytics(data) {
   
   // New Operator Analysis Chart
   updateOperatorAnalysis(data);
+  
+  // Update leaderboard data
+  updateLeaderboard(data);
 }
 
 // New function for operator analysis
@@ -264,58 +263,6 @@ function updateOperatorAnalysis(data) {
 
 // Timeline chart function
 function updateTimeline(data) {
-  // Group crashes by year for timeline
-  const yearlyData = {};
-  data.forEach((d) => {
-    yearlyData[d.Year] = (yearlyData[d.Year] || 0) + 1;
-  });
-
-  const years = Object.keys(yearlyData).sort();
-  const counts = years.map((y) => yearlyData[y]);
-
-  // Destroy existing chart if it exists
-  if (timelineChart) timelineChart.destroy();
-
-  // Create timeline chart
-  timelineChart = new Chart(document.getElementById("timeline-chart"), {
-    type: "line",
-    data: {
-      labels: years,
-      datasets: [
-        {
-          label: "Crashes per Year",
-          data: counts,
-          borderColor: "rgba(54, 162, 235, 1)",
-          backgroundColor: "rgba(54, 162, 235, 0.2)",
-          fill: true,
-          tension: 0.1
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "Number of Crashes"
-          }
-        },
-        x: {
-          title: {
-            display: true,
-            text: "Year"
-          }
-        }
-      }
-    },
-  });
-}
-
-// Timeline chart function
-function updateTimeline(data) {
   // Group data by year
   const yearlyData = {};
   data.forEach((d) => {
@@ -365,7 +312,127 @@ function updateTimeline(data) {
   });
 }
 
-// Apply filter function
+/**
+ * 🏆 Update leaderboard with crash statistics
+ * @param {Array} data - Array of crash data objects
+ */
+function updateLeaderboard(data) {
+  // Countries leaderboard
+  const countriesData = {};
+  data.forEach(crash => {
+    const country = crash.Country || 'Unknown';
+    if (!countriesData[country]) {
+      countriesData[country] = { crashes: 0, fatalities: 0 };
+    }
+    countriesData[country].crashes++;
+    countriesData[country].fatalities += crash.Fatalities || 0;
+  });
+
+  // Convert to array and sort by crashes
+  const countriesArray = Object.entries(countriesData)
+    .map(([name, stats]) => ({ name, ...stats }))
+    .sort((a, b) => b.crashes - a.crashes);
+
+  // Populate countries leaderboard table
+  const countriesTable = document.getElementById('countries-leaderboard').getElementsByTagName('tbody')[0];
+  countriesTable.innerHTML = '';
+  countriesArray.slice(0, 10).forEach((country, index) => {
+    const row = countriesTable.insertRow();
+    row.insertCell(0).textContent = index + 1;
+    row.insertCell(1).textContent = country.name;
+    row.insertCell(2).textContent = country.crashes;
+    row.insertCell(3).textContent = country.fatalities;
+    
+    // Add ranking classes for special styling
+    if (index < 3) {
+      row.classList.add(`rank-${index + 1}`);
+    }
+  });
+
+  // Aircraft types leaderboard
+  const typesData = {};
+  data.forEach(crash => {
+    const type = crash.Type || 'Unknown';
+    if (!typesData[type]) {
+      typesData[type] = { crashes: 0, fatalities: 0 };
+    }
+    typesData[type].crashes++;
+    typesData[type].fatalities += crash.Fatalities || 0;
+  });
+
+  // Convert to array and sort by crashes
+  const typesArray = Object.entries(typesData)
+    .map(([name, stats]) => ({ name, ...stats }))
+    .sort((a, b) => b.crashes - a.crashes);
+
+  // Populate types leaderboard table
+  const typesTable = document.getElementById('types-leaderboard').getElementsByTagName('tbody')[0];
+  typesTable.innerHTML = '';
+  typesArray.slice(0, 10).forEach((type, index) => {
+    const row = typesTable.insertRow();
+    row.insertCell(0).textContent = index + 1;
+    row.insertCell(1).textContent = type.name;
+    row.insertCell(2).textContent = type.crashes;
+    row.insertCell(3).textContent = type.fatalities;
+    
+    // Add ranking classes for special styling
+    if (index < 3) {
+      row.classList.add(`rank-${index + 1}`);
+    }
+  });
+
+  // Highest fatalities leaderboard
+  const fatalitiesArray = [...data]
+    .filter(crash => crash.Fatalities > 0)
+    .sort((a, b) => b.Fatalities - a.Fatalities);
+
+  // Populate fatalities leaderboard table
+  const fatalitiesTable = document.getElementById('fatalities-leaderboard').getElementsByTagName('tbody')[0];
+  fatalitiesTable.innerHTML = '';
+  fatalitiesArray.slice(0, 10).forEach((crash, index) => {
+    const row = fatalitiesTable.insertRow();
+    row.insertCell(0).textContent = index + 1;
+    row.insertCell(1).textContent = crash.Location;
+    row.insertCell(2).textContent = crash.Year;
+    row.insertCell(3).textContent = crash.Type;
+    row.insertCell(4).textContent = crash.Fatalities;
+    
+    // Add ranking classes for special styling
+    if (index < 3) {
+      row.classList.add(`rank-${index + 1}`);
+    }
+  });
+
+  // Decade analysis
+  const decadesData = {};
+  data.forEach(crash => {
+    const decade = Math.floor(crash.Year / 10) * 10;
+    if (!decadesData[decade]) {
+      decadesData[decade] = { crashes: 0, fatalities: 0 };
+    }
+    decadesData[decade].crashes++;
+    decadesData[decade].fatalities += crash.Fatalities || 0;
+  });
+
+  // Convert to array and sort by decade
+  const decadesArray = Object.entries(decadesData)
+    .map(([decade, stats]) => ({ decade: parseInt(decade), ...stats }))
+    .sort((a, b) => a.decade - b.decade);
+
+  // Populate decades leaderboard table
+  const decadesTable = document.getElementById('decades-leaderboard').getElementsByTagName('tbody')[0];
+  decadesTable.innerHTML = '';
+  decadesArray.forEach(decade => {
+    const row = decadesTable.insertRow();
+    row.insertCell(0).textContent = `${decade.decade}s`;
+    row.insertCell(1).textContent = decade.crashes;
+    row.insertCell(2).textContent = decade.fatalities;
+  });
+}
+
+/**
+ * Apply filter function
+ */
 function applyFilters() {
   // Get filter values from UI elements
   const minY = +document.getElementById("yearMin").value || 0;
@@ -419,15 +486,54 @@ function resetFilters() {
   updateTimeline(crashData);
 }
 
-// 🎯 Future enhancement placeholder function
+/**
+ * 🎯 Future enhancement placeholder function
+ */
 function futureEnhancement() {
   // Reserved for future functionality
   // Will implement advanced filtering options
 }
 
-// 📡 Event listeners for filter buttons
+/**
+ * 📡 Event listeners for filter buttons
+ */
 document.getElementById("applyFilter").addEventListener("click", applyFilters);
 document.getElementById("resetFilter").addEventListener("click", resetFilters);
 
-// 🚀 Initialize the application when page loads
+/**
+ * Show map view function
+ */
+function showMapView() {
+  const mapView = document.getElementById('map-view');
+  const leaderboardView = document.getElementById('leaderboard-view');
+  const showLeaderboardBtn = document.getElementById('show-leaderboard-btn');
+  
+  if (mapView && leaderboardView && showLeaderboardBtn) {
+    mapView.style.display = 'block';
+    leaderboardView.style.display = 'none';
+    showLeaderboardBtn.style.display = 'inline-block';
+  }
+}
+
+/**
+ * Show leaderboard view function
+ */
+function showLeaderboardView() {
+  const mapView = document.getElementById('map-view');
+  const leaderboardView = document.getElementById('leaderboard-view');
+  const showLeaderboardBtn = document.getElementById('show-leaderboard-btn');
+  
+  if (mapView && leaderboardView && showLeaderboardBtn) {
+    mapView.style.display = 'none';
+    leaderboardView.style.display = 'block';
+    showLeaderboardBtn.style.display = 'none';
+    
+    // Update leaderboard when shown
+    updateLeaderboard(crashData);
+  }
+}
+
+/**
+ * 🚀 Initialize the application when page loads
+ */
 loadData();
