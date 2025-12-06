@@ -1,0 +1,50 @@
+name: "✨ Enhancement"
+description: Improve existing flight crash features
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Flight Crash Feature Improvement
+
+  - type: textarea
+    id: current
+    attributes:
+      label: "📊 Current"
+      description: "What works now?"
+      placeholder: "Search shows 50 crashes per page"
+    validations:
+      required: true
+
+  - type: textarea
+    id: desired
+    attributes:
+      label: "🎯 Desired"
+      description: "What should it do?"
+      placeholder: "Infinite scroll - load 20 more on scroll"
+    validations:
+      required: true
+
+  - type: textarea
+    id: benefit
+    attributes:
+      label: "🚀 Why Better?"
+      description: "User/data benefit?"
+      placeholder: "Faster browsing of 5000+ crashes"
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: "📍 Area"
+      options:
+        - Search & filters
+        - Data visualization
+        - Maps
+        - Tables/charts
+        - Export
+        - Performance
+
+  - type: textarea
+    id: mockup
+    attributes:
+      label: "🎨 Mockup (optional)"
