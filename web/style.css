@@ -14,9 +14,17 @@ body {
   box-shadow: 2px 0 5px rgba(0,0,0,0.1);
 }
 
-#map {
+#content {
   flex: 1;
   height: 100vh;
+}
+
+#map-view, #leaderboard-view {
+  height: 100%;
+}
+
+#map {
+  height: 100%;
 }
 
 input,
@@ -49,6 +57,15 @@ button:hover {
 
 #resetFilter:hover {
   background-color: #545b62;
+}
+
+#show-leaderboard-btn {
+  background-color: #28a745;
+  margin-top: 10px;
+}
+
+#show-leaderboard-btn:hover {
+  background-color: #218838;
 }
 
 .row {
@@ -105,4 +122,79 @@ canvas {
 
 #operator-container {
   margin-top: 15px;
+}
+
+/* Leaderboard Styles */
+#leaderboard-view {
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.leaderboard-section {
+  margin-bottom: 30px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 20px;
+}
+
+.leaderboard-section h3 {
+  margin-top: 0;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.leaderboard-controls {
+  margin-bottom: 20px;
+}
+
+#show-map-btn, #show-leaderboard-btn {
+  background-color: #28a745;
+  padding: 10px 15px;
+}
+
+#show-map-btn:hover, #show-leaderboard-btn:hover {
+  background-color: #218838;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+}
+
+tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+tr:hover {
+  background-color: #e9ecef;
+}
+
+.rank-1 {
+  font-weight: bold;
+  color: gold;
+}
+
+.rank-2 {
+  font-weight: bold;
+  color: silver;
+}
+
+.rank-3 {
+  font-weight: bold;
+  color: #cd7f32; /* bronze */
 }

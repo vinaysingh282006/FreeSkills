@@ -202,6 +202,9 @@ function updateAnalytics(data) {
   
   // New Operator Analysis Chart
   updateOperatorAnalysis(data);
+  
+  // Update leaderboard data
+  updateLeaderboard(data);
 }
 
 // New function for operator analysis
@@ -972,5 +975,40 @@ function showExportDialog(data) {
   document.body.appendChild(modal);
 }
 
-// 🚀 Initialize the application when page loads
+/**
+ * Show map view function
+ */
+function showMapView() {
+  const mapView = document.getElementById('map-view');
+  const leaderboardView = document.getElementById('leaderboard-view');
+  const showLeaderboardBtn = document.getElementById('show-leaderboard-btn');
+  
+  if (mapView && leaderboardView && showLeaderboardBtn) {
+    mapView.style.display = 'block';
+    leaderboardView.style.display = 'none';
+    showLeaderboardBtn.style.display = 'inline-block';
+  }
+}
+
+/**
+ * Show leaderboard view function
+ */
+function showLeaderboardView() {
+  const mapView = document.getElementById('map-view');
+  const leaderboardView = document.getElementById('leaderboard-view');
+  const showLeaderboardBtn = document.getElementById('show-leaderboard-btn');
+  
+  if (mapView && leaderboardView && showLeaderboardBtn) {
+    mapView.style.display = 'none';
+    leaderboardView.style.display = 'block';
+    showLeaderboardBtn.style.display = 'none';
+    
+    // Update leaderboard when shown
+    updateLeaderboard(crashData);
+  }
+}
+
+/**
+ * 🚀 Initialize the application when page loads
+ */
 loadData();
